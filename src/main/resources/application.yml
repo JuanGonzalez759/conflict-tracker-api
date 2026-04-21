@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: conflict-tracker-api
+
+  datasource:
+    url: ${DB_URL:${DATABASE_URL:jdbc:h2:mem:conflictdb}}
+    driver-class-name: ${DB_DRIVER:org.h2.Driver}
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:}
+
+  jpa:
+    database-platform: ${HIBERNATE_DIALECT:org.hibernate.dialect.H2Dialect}
+    hibernate:
+      ddl-auto: ${HIBERNATE_DDL_AUTO:create-drop}
+    show-sql: ${SPRING_JPA_SHOW_SQL:true}
+    properties:
+      hibernate:
+        format_sql: ${SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL:true}
+
+  sql:
+    init:
+      mode: always
+
+frontend:
+  url: ${FRONTEND_URL:http://localhost:5173}
+
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /
+
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    com.conflicttracker: DEBUG

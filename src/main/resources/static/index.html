@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conflict Tracker API - Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .status.loading {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.85em;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        tr:hover {
+            background: #f5f5f5;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .badge.active {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .badge.frozen {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .badge.ended {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.2em;
+        }
+        
+        footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Conflict Tracker API</h1>
+            <p>Sistema de Información sobre Conflictos Bélicos Mundiales</p>
+        </header>
+        
+        <div class="content">
+            <div id="status" class="status loading">
+                Cargando conflictos desde la API...
+            </div>
+            
+            <div id="tableContainer"></div>
+        </div>
+        
+        <footer>
+            <p>API REST desarrollada con <strong>Spring Boot 3</strong></p>
+            <p>Endpoint: <a href="/api/v1/conflicts" target="_blank">http://localhost:8080/api/v1/conflicts</a></p>
+        </footer>
+    </div>
+    
+    <script>
+        // Función principal para cargar los conflictos
+        async function loadConflicts() {
+            const statusDiv = document.getElementById('status');
+            const tableContainer = document.getElementById('tableContainer');
+            
+            try {
+                // Realizar petición fetch al endpoint de la API
+                const response = await fetch('/api/v1/conflicts');
+                
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                
+                const conflicts = await response.json();
+                
+                // Actualizar estado
+                statusDiv.className = 'status success';
+                statusDiv.textContent = `${conflicts.length} conflictos cargados correctamente`;
+                
+                // Mostrar datos en tabla
+                displayConflicts(conflicts);
+                
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = `Error al cargar los conflictos: ${error.message}`;
+                console.error('Error:', error);
+            }
+        }
+        
+        // Función para mostrar los conflictos en una tabla
+        function displayConflicts(conflicts) {
+            const tableContainer = document.getElementById('tableContainer');
+            
+            if (conflicts.length === 0) {
+                tableContainer.innerHTML = '<div class="no-data">No hay conflictos registrados</div>';
+                return;
+            }
+            
+            let tableHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre del Conflicto</th>
+                            <th>Fecha de Inicio</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            conflicts.forEach(conflict => {
+                const statusClass = conflict.status.toLowerCase();
+                const statusText = getStatusText(conflict.status);
+                const formattedDate = formatDate(conflict.startDate);
+                
+                tableHTML += `
+                    <tr>
+                        <td>${conflict.id}</td>
+                        <td><strong>${conflict.name}</strong></td>
+                        <td>${formattedDate}</td>
+                        <td><span class="badge ${statusClass}">${statusText}</span></td>
+                    </tr>
+                `;
+            });
+            
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+            
+            tableContainer.innerHTML = tableHTML;
+        }
+        
+        // Función para formatear la fecha
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('es-ES', options);
+        }
+        
+        // Función para traducir el estado
+        function getStatusText(status) {
+            const statusMap = {
+                'ACTIVE': 'Activo',
+                'FROZEN': 'Congelado',
+                'ENDED': 'Finalizado'
+            };
+            return statusMap[status] || status;
+        }
+        
+        // Cargar conflictos cuando la página esté lista
+        document.addEventListener('DOMContentLoaded', loadConflicts);
+    </script>
+</body>
+</html>
