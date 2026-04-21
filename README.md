@@ -7,14 +7,14 @@ Conflict Tracker es una aplicación backend que proporciona una API REST complet
 ```
 ┌─────────────────────────────────────────────────────┐
 │            Frontend Layer (Vue 3 + Vite)            │
-│  Vercel/Netlify: https://<your-frontend>.vercel.app│
+│  Vercel: https://conflict-tracker-juan-gonzalez.vercel.app
 └──────────────────┬──────────────────────────────────┘
                    │ VITE_API_URL
                    │ (CORS allowed)
                    ↓
 ┌─────────────────────────────────────────────────────┐
 │       Backend Layer (Spring Boot + Java 17)         │
-│    Railway/Render/Fly.io: https://<your-api>       │
+│    Railway: https://conflict-tracker-api-production.up.railway.app
 │         /api/v1 (REST API)                          │
 └──────────────────┬──────────────────────────────────┘
                    │ JDBC PostgreSQL
@@ -24,6 +24,12 @@ Conflict Tracker es una aplicación backend que proporciona una API REST complet
 │  https://cnblimsqcyvurigapfpc.supabase.co          │
 └─────────────────────────────────────────────────────┘
 ```
+
+### URLs públicas
+
+- Frontend: `https://conflict-tracker-juan-gonzalez.vercel.app`
+- Backend API: `https://conflict-tracker-api-production.up.railway.app/api/v1`
+- PostgreSQL: `https://cnblimsqcyvurigapfpc.supabase.co`
 
 ## Características Principales
 
@@ -120,22 +126,43 @@ Conflict Tracker es una aplicación backend que proporciona una API REST complet
 Per desplegar el backend en un contenidor amb PostgreSQL al núvol, utilitza variables d'entorn externes.
 
 ### Variables d'entorn importants
-- `DB_URL`: URL de connexió a PostgreSQL, per exemple `jdbc:postgresql://host:port/dbname`
-- `DB_USERNAME`: usuari de la base de dades
+- `DB_URL`: URL de connexió a PostgreSQL, per exemple `jdbc:postgresql://aws-1-eu-central-1.pooler.supabase.com:6543/postgres?sslmode=require`
+- `DB_USERNAME`: usuari de la base de dades (per exemple `postgres.cnblimsqcyvurigapfpc`)
 - `DB_PASSWORD`: contrasenya de la base de dades
-- `DB_DRIVER`: `org.postgresql.Driver` (opcional, per defecte H2)
-- `HIBERNATE_DDL_AUTO`: `update` o `validate` en producció
-- `FRONTEND_URL`: URL pública del frontend per a CORS, per exemple `https://<your-frontend-url>`
-- `SERVER_PORT`: port on escolta Spring Boot (opcjonal)
+- `DB_DRIVER`: `org.postgresql.Driver`
+- `HIBERNATE_DDL_AUTO`: `validate` en producció
+- `SPRING_SQL_INIT_MODE`: `never` per evitar l'execució de `data.sql` en producció
+- `FRONTEND_URL`: URL pública del frontend per a CORS, per exemple `https://conflict-tracker-juan-gonzalez.vercel.app`
+- `SERVER_PORT`: port on escolta Spring Boot
+
+### Deploy en Railway
+A Railway, configura aquestes variables en el servei `conflict-tracker-api`:
+
+```env
+DB_URL=jdbc:postgresql://aws-1-eu-central-1.pooler.supabase.com:6543/postgres?sslmode=require
+DB_USERNAME=postgres.cnblimsqcyvurigapfpc
+DB_PASSWORD=juanbasededatos1
+DB_DRIVER=org.postgresql.Driver
+HIBERNATE_DDL_AUTO=validate
+SPRING_SQL_INIT_MODE=never
+FRONTEND_URL=https://conflict-tracker-juan-gonzalez.vercel.app
+```
 
 ### CORS segur
-El backend utilitza un configurador global de CORS (`WebConfig`) que only permet orígens des de `FRONTEND_URL`.
+El backend utilitza un configurador global de CORS (`WebConfig`) que només permet orígens des de `FRONTEND_URL`.
 
 ### Construir i executar en producció
 ```bash
 mvn clean package
 java -jar target/conflict-tracker-api-1.0.0.jar
 ```
+
+### Modificaciones realizadas
+- Configurado `src/main/resources/application.yml` para leer variables de entorno externas.
+- Añadido `WebConfig.java` para habilitar CORS solo desde `FRONTEND_URL`.
+- Ajustado el despliegue en Railway para usar `HIBERNATE_DDL_AUTO=validate` y `SPRING_SQL_INIT_MODE=never`, evitando la reejecución de `data.sql` en producción.
+- Corregido el problema de CORS y la conexión segura contra PostgreSQL en Supabase.
+
 ## Frontend Web - Thymeleaf
 
 Se ha implementado una interfaz web clásica usando **Thymeleaf** que permite interactuar con la aplicación de forma visual.
