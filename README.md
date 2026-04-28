@@ -7,7 +7,7 @@ Conflict Tracker es una aplicación backend que proporciona una API REST complet
 ```
 ┌─────────────────────────────────────────────────────┐
 │            Frontend Layer (Vue 3 + Vite)            │
-│  Vercel: https://conflict-tracker-juan-gonzalez.vercel.app
+│  Vercel: https://conflict-tracker-juan-gonzalez-cgag.vercel.app
 └──────────────────┬──────────────────────────────────┘
                    │ VITE_API_URL
                    │ (CORS allowed)
@@ -27,7 +27,7 @@ Conflict Tracker es una aplicación backend que proporciona una API REST complet
 
 ### URLs públicas
 
-- Frontend: `https://conflict-tracker-juan-gonzalez.vercel.app`
+- Frontend: `https://conflict-tracker-juan-gonzalez-cgag.vercel.app`
 - Backend API: `https://conflict-tracker-api-production.up.railway.app/api/v1`
 - PostgreSQL: `https://cnblimsqcyvurigapfpc.supabase.co`
 
@@ -132,7 +132,7 @@ Per desplegar el backend en un contenidor amb PostgreSQL al núvol, utilitza var
 - `DB_DRIVER`: `org.postgresql.Driver`
 - `HIBERNATE_DDL_AUTO`: `validate` en producció
 - `SPRING_SQL_INIT_MODE`: `never` per evitar l'execució de `data.sql` en producció
-- `FRONTEND_URL`: URL pública del frontend per a CORS, per exemple `https://conflict-tracker-juan-gonzalez.vercel.app`
+- `FRONTEND_URL`: URL pública del frontend per a CORS, per exemple `https://conflict-tracker-juan-gonzalez-cgag.vercel.app`
 - `SERVER_PORT`: port on escolta Spring Boot
 
 ### Deploy en Railway
@@ -145,7 +145,7 @@ DB_PASSWORD=juanbasededatos1
 DB_DRIVER=org.postgresql.Driver
 HIBERNATE_DDL_AUTO=validate
 SPRING_SQL_INIT_MODE=never
-FRONTEND_URL=https://conflict-tracker-juan-gonzalez.vercel.app
+FRONTEND_URL=https://conflict-tracker-juan-gonzalez-cgag.vercel.app
 ```
 
 ### CORS segur
